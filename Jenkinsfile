@@ -7,6 +7,7 @@ pipeline {
     DOCKERREPO = "quay.io/ortelius/hello-world"
     DHURL = "https://ortelius.pangarabbit.com"
   }
+}
 
 podTemplate(containers: [
     containerTemplate(
