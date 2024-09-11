@@ -4,10 +4,10 @@
 
 pipeline {
   environment {
-	DHUSER = "<myuserid>"
-    DHPASS = "<mypassword>"
-    DHORG = "<myorg>"
-    DHPROJECT = "<myproject>"
+	DHUSER = "admin"
+    DHPASS = "admin"
+    DHORG = "PangaRabbit"
+    DHPROJECT = "ortelius-jenkins-demo-app"
     DOCKERREPO = "quay.io/ortelius/hello-world"
     DHURL = "https://console.deployhub.com"
   }
