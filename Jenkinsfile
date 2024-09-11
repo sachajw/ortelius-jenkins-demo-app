@@ -24,6 +24,7 @@ pipeline {
             pip install deployhub
             git clone https://github.com/dstar55/docker-hello-world-spring-boot
             cd docker-hello-world-spring-boot
+            pip show pydantic
             dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
         '''
             }
