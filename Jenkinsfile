@@ -4,10 +4,14 @@ pipeline {
     DHPASS = "admin"
     DHORG = "pangarabbit"
     DHPROJECT = "ortelius-jenkins-demo-app"
-    DOCKERREPO = "quay.io/ortelius/hello-world"
-    DHURL = "https://jenkins.pangarabbit.com"
+    DOCKERREPO = "thevestedleopard/hello-world"
+    DHURL = "https://ortelius.pangarabbit.com"
   }
-  agent any
+
+agent {
+  docker { image 'python:latest' }
+}
+
   stages {
     stage('Setup') {
       steps {
