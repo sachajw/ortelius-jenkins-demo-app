@@ -1,26 +1,24 @@
 pipeline {
   environment {
-    DHUSER = "admin"
-    DHPASS = "admin"
-    DHORG = "pangarabbit"
-    DHPROJECT = "ortelius-jenkins-demo-app"
+	DHUSER = "<myuserid>"
+    DHPASS = "<mypassword>"
+    DHORG = "<myorg>"
+    DHPROJECT = "<myproject>"
     DOCKERREPO = "quay.io/ortelius/hello-world"
-    DHURL = "https://ortelius.pangarabbit.com"
+    DHURL = "https://console.deployhub.com"
   }
-
-agent any
+  agent any
   stages {
     stage('Setup') {
       steps {
-        container('python-jenkins-agent') {
         sh '''
             pip install deployhub
             git clone https://github.com/dstar55/docker-hello-world-spring-boot
             cd docker-hello-world-spring-boot
             dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
         '''
-        }
       }
+    }
     stage('Build and push image') {
       steps{
         sh '''
@@ -30,7 +28,7 @@ agent any
 
             # This line determines the docker digest for the image
             echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
-        '''
+       '''
       }
     }
     stage('Capture SBOM') {
@@ -54,7 +52,6 @@ agent any
             source ${WORKSPACE}/dhenv.sh
             dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
         '''
-        }
       }
     }
   }
