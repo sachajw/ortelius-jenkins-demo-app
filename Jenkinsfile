@@ -7,6 +7,15 @@ pipeline {
     DOCKERREPO = "quay.io/ortelius/hello-world"
     DHURL = "https://ortelius.pangarabbit.com"
   }
+
+podTemplate(containers: [
+    containerTemplate(
+        name: 'python',
+        image: 'python:latest',
+        command: 'sleep',
+        args: '30d')
+  ]) {
+
   agent any
   stages {
     stage('Setup') {
