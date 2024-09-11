@@ -1,7 +1,3 @@
-@Library("shared-library") _
-
-// pipeline to deploy a glue job to aws
-
 pipeline {
   environment {
 	DHUSER = "admin"
@@ -9,7 +5,7 @@ pipeline {
     DHORG = "PangaRabbit"
     DHPROJECT = "ortelius-jenkins-demo-app"
     DOCKERREPO = "quay.io/ortelius/hello-world"
-    DHURL = "https://console.deployhub.com"
+    DHURL = "https://ortelius.pangarabbit.com"
   }
   agent any
   stages {
