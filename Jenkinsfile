@@ -32,7 +32,7 @@ pipeline {
 
             # This line determines the docker digest for the image
             echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
-       '''
+        '''
       }
     }
     stage('Capture SBOM') {
