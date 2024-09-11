@@ -8,9 +8,19 @@ pipeline {
     DHURL = "https://ortelius.pangarabbit.com"
   }
 
-agent {
-  docker { image 'python:latest' }
-}
+podTemplate(containers: [
+  containerTemplate(
+      name: 'maven',
+      image: 'maven:3.8.1-jdk-8',
+      command: 'sleep',
+      args: '30d'
+      ),
+  containerTemplate(
+      name: 'python',
+      image: 'python:latest',
+      command: 'sleep',
+      args: '30d')
+]) {
 
   stages {
     stage('Setup') {
