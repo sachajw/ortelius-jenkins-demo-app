@@ -6,6 +6,8 @@ podTemplate(containers: [
         args: '30d')
   ])
 
+agent any
+
 pipeline {
   environment {
 	DHUSER = "admin"
@@ -17,7 +19,6 @@ pipeline {
   }
 }
 
-agent any
 stages {
   stage('Setup') {
     steps {
