@@ -8,20 +8,7 @@ pipeline {
     DHURL = "https://ortelius.pangarabbit.com"
   }
 
-  agent {
-    kubernetes {
-      yaml """
-      apiVersion: v1
-      kind: Pod
-      spec:
-        containers:
-        - name: python-jenkins-agent
-          image: python:3.9
-          tty: true
-      """
-    }
-  }
-
+agent any
   stages {
     stage('Setup') {
       steps {
