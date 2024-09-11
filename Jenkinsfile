@@ -1,11 +1,3 @@
-podTemplate(containers: [
-    containerTemplate(
-        name: 'python',
-        image: 'python:latest',
-        command: 'sleep',
-        args: '30d')
-  ])
-
 pipeline {
   environment {
 	DHUSER = "admin"
