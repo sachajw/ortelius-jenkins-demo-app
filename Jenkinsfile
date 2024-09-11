@@ -1,53 +1,48 @@
 pipeline {
-  environment {
-	DHUSER = "admin"
-    DHPASS = "admin"
-    DHORG = "pangarabbit"
-    DHPROJECT = "ortelius-jenkins-demo-app"
-    DOCKERREPO = "thevestedleopard/hello-world"
-    DHURL = "https://ortelius.pangarabbit.com"
-  }
+    environment {
+        DHUSER = "admin"
+        DHPASS = "admin"
+        DHORG = "pangarabbit"
+        DHPROJECT = "ortelius-jenkins-demo-app"
+        DOCKERREPO = "thevestedleopard/hello-world"
+        DHURL = "https://ortelius.pangarabbit.com"
+    }
 
-podTemplate(containers: [
-  containerTemplate(
-      name: 'maven',
-      image: 'maven:3.8.1-jdk-8',
-      command: 'sleep',
-      args: '30d'
-      ),
-  containerTemplate(
-      name: 'python',
-      image: 'python:latest',
-      command: 'sleep',
-      args: '30d')
-]) {
+    agent {
+        kubernetes {
+            cloud 'PangaRabbit K8s'
+            defaultContainer 'python-jenkins-agent'
+            inheritFrom 'python-jenkins-agent'
+            namespace 'infrastructure'
+        }
+    }
 
-  stages {
-    stage('Setup') {
-      steps {
-        sh '''
+    stages {
+        stage('Setup') {
+            steps {
+                sh '''
             pip install deployhub
             git clone https://github.com/dstar55/docker-hello-world-spring-boot
             cd docker-hello-world-spring-boot
             dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
         '''
-      }
-    }
-    stage('Build and push image') {
-      steps{
-        sh '''
+            }
+        }
+        stage('Build and push image') {
+            steps {
+                sh '''
             source ${WORKSPACE}/dhenv.sh
             docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
             docker push ${DOCKERREPO}:${IMAGE_TAG}
 
             # This line determines the docker digest for the image
             echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
-       '''
-      }
-    }
-    stage('Capture SBOM') {
-      steps{
-        sh '''
+        '''
+            }
+        }
+        stage('Capture SBOM') {
+            steps {
+                sh '''
             source ${WORKSPACE}/dhenv.sh
             # install Syft
             curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
@@ -58,15 +53,15 @@ podTemplate(containers: [
             # display the SBOM
             cat ${WORKSPACE}/cyclonedx.json
         '''
-      }
-    }
-    stage('Create Component with Build Data and SBOM') {
-      steps{
-        sh '''
+            }
+        }
+        stage('Create Component with Build Data and SBOM') {
+            steps {
+                sh '''
             source ${WORKSPACE}/dhenv.sh
             dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
         '''
-      }
+            }
+        }
     }
-  }
 }
