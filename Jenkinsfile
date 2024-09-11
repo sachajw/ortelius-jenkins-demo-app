@@ -8,13 +8,14 @@ podTemplate(containers: [
 
 pipeline {
   environment {
-	DHUSER = "<admin"
-    DHPASS = "<admin>"
-    DHORG = "<pangarabbit>"
-    DHPROJECT = "<ortelius-jenkins-demo-app>"
+	DHUSER = "admin"
+    DHPASS = "admin"
+    DHORG = "pangarabbit"
+    DHPROJECT = "ortelius-jenkins-demo-app"
     DOCKERREPO = "quay.io/ortelius/hello-world"
     DHURL = "https://ortelius.pangarabbit.com"
   }
+
   agent any
   stages {
     stage('Setup') {
