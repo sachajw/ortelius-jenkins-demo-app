@@ -11,8 +11,8 @@ pipeline {
     agent {
         kubernetes {
             cloud 'PangaRabbit K8s'
-            defaultContainer 'python2'
-            inheritFrom 'python2'
+            defaultContainer 'python3'
+            inheritFrom 'python3'
             namespace 'infrastructure'
         }
     }
