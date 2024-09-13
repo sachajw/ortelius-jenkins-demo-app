@@ -13,7 +13,7 @@ pipeline {
             cloud 'PangaRabbit K8s'
             defaultContainer 'python3'
             inheritFrom 'python3'
-            namespace 'infrastructure'
+            namespace 'app'
         }
     }
 
