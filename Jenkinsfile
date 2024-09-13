@@ -17,10 +17,18 @@ pipeline {
     //     }
     // }
 
+    // agent {
+    //     kubernetes {
+    //         cloud 'PangaRabbit K8s'
+    //         label 'python3'
+    //         defaultContainer 'python3'
+    //     }
+    // }
+
     agent {
         kubernetes {
             cloud 'PangaRabbit K8s'
-            label 'python3'
+            inheritFrom 'python3'
             defaultContainer 'python3'
         }
     }
