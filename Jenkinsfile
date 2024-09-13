@@ -21,7 +21,7 @@ pipeline {
         stage('Setup') {
             steps {
                 sh '''
-            pip install deployhub
+            pip install ortelius-cli
             git clone https://github.com/dstar55/docker-hello-world-spring-boot
             cd docker-hello-world-spring-boot
             dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
