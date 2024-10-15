@@ -31,7 +31,7 @@ pipeline {
         stage('Build and push image') {
             steps {
                 sh '''
-            source ${WORKSPACE}/dhenv.sh
+            . ${WORKSPACE}/dhenv.sh
             docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
             docker push ${DOCKERREPO}:${IMAGE_TAG}
 
