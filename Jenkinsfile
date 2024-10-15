@@ -43,7 +43,7 @@ pipeline {
         stage('Capture SBOM') {
             steps {
                 sh '''
-            source ${WORKSPACE}/dhenv.sh
+            . ${WORKSPACE}/dhenv.sh
             # install Syft
             curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
 
@@ -58,7 +58,7 @@ pipeline {
         stage('Create Component with Build Data and SBOM') {
             steps {
                 sh '''
-            source ${WORKSPACE}/dhenv.sh
+            . ${WORKSPACE}/dhenv.sh
             dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
         '''
             }
