@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'cicd-jenkins-dind' // Ensure this matches the label of your Docker in Docker agent
+        label 'cicd-jenkins-agent-dind' // Ensure this matches the label of your Docker in Docker agent
     }
     environment {
         DHUSER = "admin"
