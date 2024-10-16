@@ -11,14 +11,14 @@ pipeline {
         DHURL = "https://ortelius.pangarabbit.com"
     }
 
-    agent {
-        kubernetes {
-            cloud 'PangaRabbit K8s'
-            defaultContainer 'python3'
-            inheritFrom 'python3'
-            namespace 'app'
-        }
-    }
+    // agent {
+    //     kubernetes {
+    //         cloud 'PangaRabbit K8s'
+    //         defaultContainer 'python3'
+    //         inheritFrom 'python3'
+    //         namespace 'app'
+    //     }
+    // }
 
     stages {
         stage('Setup') {
