@@ -1,7 +1,4 @@
 pipeline {
-    agent {
-        label 'cicd-jenkins-agent-dind' // Ensure this matches the label of your Docker in Docker agent
-    }
     environment {
         DHUSER = "admin"
         DHPASS = "admin"
@@ -11,14 +8,14 @@ pipeline {
         DHURL = "https://ortelius.pangarabbit.com"
     }
 
-    // agent {
-    //     kubernetes {
-    //         cloud 'PangaRabbit K8s'
-    //         defaultContainer 'python3'
-    //         inheritFrom 'python3'
-    //         namespace 'app'
-    //     }
-    // }
+    agent {
+        kubernetes {
+            cloud 'PangaRabbit K8s'
+            defaultContainer 'dind'
+            inheritFrom 'dind'
+            namespace 'app'
+        }
+    }
 
     stages {
         stage('Setup') {
