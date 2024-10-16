@@ -11,8 +11,8 @@ pipeline {
     agent {
         kubernetes {
             cloud 'PangaRabbit K8s'
-            defaultContainer 'dind'
-            inheritFrom 'dind'
+            defaultContainer 'cicd-jenkins-agent-dind'
+            inheritFrom 'cicd-jenkins-agent-dind'
             namespace 'app'
         }
     }
