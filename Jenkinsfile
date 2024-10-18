@@ -78,10 +78,18 @@ pipeline {
     post {
         always {
             withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
-                discordSend description: "Ortelius Demo App",
+                discordSend description: """
+                            Ortelius Demo App
+                            Result: ${currentBuild.currentResult}
+                            Build Number: #${env.BUILD_NUMBER}
+                            Branch: ${env.GIT_BRANCH}
+                            Commit: ${env.GIT_COMMIT}
+                            Triggered by: ${currentBuild.getBuildCauses().toString()}
+                            Duration: ${currentBuild.durationString}
+                            """,
                             footer: "Come to the Ortelius side of life!",
                             link: env.BUILD_URL,
-                            result: currentBuild.currentResult,currentBuild.result,currentBuild.durationString,
+                            result: currentBuild.currentResult,
                             title: env.JOB_NAME,
                             webhookURL: "${DISCORD}"
             }
