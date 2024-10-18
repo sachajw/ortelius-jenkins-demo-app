@@ -46,13 +46,17 @@ pipeline {
         }
         stage('Docker Login') {
             steps {
+                container('python3') {
                 sh '''
                     echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
                 '''
+                }
             }
+
         }
         stage('Build and push image') {
             steps {
+                container('python3') {
                 sh '''
                     . ${WORKSPACE}/dhenv.sh
                     docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
@@ -61,10 +65,12 @@ pipeline {
                     # This line determines the docker digest for the image
                     echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
                 '''
+                }
             }
         }
         stage('Capture SBOM') {
             steps {
+                container('python3') {
                 sh '''
                     . ${WORKSPACE}/dhenv.sh
                     # install Syft
@@ -76,17 +82,19 @@ pipeline {
                     # display the SBOM
                     cat ${WORKSPACE}/cyclonedx.json
                 '''
+                }
             }
         }
         stage('Create Component with Build Data and SBOM') {
             steps {
+                container('python3') {
                 sh '''
                     . ${WORKSPACE}/dhenv.sh
                     dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
                 '''
+                }
             }
         }
-    }
     post {
         always {
             withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
