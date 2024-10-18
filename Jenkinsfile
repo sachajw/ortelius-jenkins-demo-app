@@ -86,13 +86,13 @@ pipeline {
             withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
                 discordSend description: """
                                 Result: ${currentBuild.currentResult}
-                                Job: ${JOB_NAME} [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+                                Service: ${JOB_NAME} [#${env.BUILD_NUMBER}](${env.BUILD_URL})
                                 Branch: ${env.GIT_BRANCH}
-                                Commit User: ${env.CHANGE_AUTHOR_DISPLAY_NAME}
+                                Commit User: ${env.GIT_COMMITTER_NAME ?: 'N/A'} <${env.GIT_COMMITTER_EMAIL ?: 'N/A'}>
                                 Triggered by: ${currentBuild.getBuildCauses()[0]?.userId ?: 'N/A'}
                                 Duration: ${currentBuild.durationString}
                             """,
-                            footer: "Come to the Ortelius side of life!",
+                            footer: "I robot love you!",
                             link: env.BUILD_URL,
                             result: currentBuild.currentResult,
                             title: env.JOB_NAME,
