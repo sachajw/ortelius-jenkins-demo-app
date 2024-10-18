@@ -7,7 +7,7 @@ pipeline {
         DHPASS = credentials('dh-pangarabbit')
         DHORG = "pangarabbit"
         DHPROJECT = "ortelius-jenkins-demo-app"
-        DHURL = "quay.io"
+        DHURL = "https://ortelius.pangarabbit.com"
     }
 
     agent {
