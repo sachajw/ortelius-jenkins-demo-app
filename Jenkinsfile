@@ -25,9 +25,6 @@ pipeline {
             steps {
                 checkout([$class: 'GitSCM',
                 branches: [[name: '*/main']],
-                doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'config']],
-                submoduleCfg: [],
                 userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]])
             }
         }
