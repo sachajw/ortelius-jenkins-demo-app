@@ -4,7 +4,7 @@ pipeline {
         DHPASS = "admin"
         DHORG = "pangarabbit"
         DHPROJECT = "ortelius-jenkins-demo-app"
-        DOCKERREPO = "quay.io/pangarabbit/cicd-jenkins-agent-dind"
+        DOCKERREPO = "quay.io/pangarabbit"
         DHURL = "https://ortelius.pangarabbit.com"
     }
 
