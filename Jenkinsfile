@@ -6,7 +6,7 @@ pipeline {
         DHPASS = credentials('quay-pangarabbit')
         DHORG = "pangarabbit"
         DHPROJECT = "ortelius-jenkins-demo-app"
-        DOCKERREPO = "quay.io/pangarabbit/"
+        DOCKERREPO = "quay.io"
         DHURL = "https://ortelius.pangarabbit.com"
     }
 
