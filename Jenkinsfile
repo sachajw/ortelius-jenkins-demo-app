@@ -32,6 +32,19 @@ pipeline {
                 }
             }
         }
+        // stage('Get Commit Info') {
+        //      steps {
+        //          container('python3') {
+        //              script {
+        //                  // Extract committer email from the latest commit
+        //                  env.GIT_COMMITTER = sh(
+        //                      script: 'git --no-pager show -s --format=\'%ae\'',
+        //                      returnStdout: true
+        //                  ).trim()
+        //              }
+        //          }
+        //      }
+        // }
         stage('Setup') {
             steps {
                 container('python3') {
@@ -105,7 +118,7 @@ pipeline {
                                     Service: ${env.JOB_NAME}
                                     Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
                                     Branch: ${env.GIT_BRANCH}
-                                    Commit User: ${env.GIT_COMMITTER_NAME ?: 'N/A'} <${env.GIT_COMMITTER_EMAIL ?: 'N/A'}>
+                                    Commit User: ${env.GIT_COMMITTER_NAME}
                                     Duration: ${currentBuild.durationString}
                                 """,
                                 footer: "I robot love you!",
