@@ -34,7 +34,7 @@ pipeline {
         stage('Docker Login') {
             steps {
                 sh '''
-                    docker login -u ${QUAYUSER} --password-stdin ${DHURL}
+                    docker login -u ${DHUSER} --password-stdin ${DHURL}
 
                 '''
             }
