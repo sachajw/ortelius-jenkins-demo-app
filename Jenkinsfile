@@ -83,7 +83,7 @@ pipeline {
                             link: env.BUILD_URL,
                             result: currentBuild.currentResult,
                             title: env.JOB_NAME,
-                            webhookURL: "${DISCORD}"
+                            webhookURL: ${DISCORD}
             }
         }
     }
