@@ -8,6 +8,7 @@ pipeline {
         DHORG = "pangarabbit"
         DHPROJECT = "ortelius-jenkins-demo-app"
         DHURL = "https://ortelius.pangarabbit.com"
+        DISCORD = credentials('pangarabbit-discord-jenkins')
     }
 
     agent {
@@ -75,6 +76,16 @@ pipeline {
                     . ${WORKSPACE}/dhenv.sh
                     dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
                 '''
+            }
+        }
+        post {
+            always {
+                discordSend description: "Ortelius Demo App",
+                            footer: "Footer Text",
+                            link: env.BUILD_URL,
+                            result: currentBuild.currentResult,
+                            title: env.JOB_NAME,
+                            webhookURL: ${DISCORD}
             }
         }
     }
