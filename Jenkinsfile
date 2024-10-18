@@ -23,94 +23,96 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Tells Jenkins that its a container running the job
+                // Tells Jenkins that it's a container running the job
                 container('python3') {
                     checkout([$class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]])
+                        branches: [[name: '*/main']],
+                        userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]
+                    ])
                 }
             }
         }
         stage('Setup') {
             steps {
                 container('python3') {
-                sh '''
-                    apt-get update && apt-get install -y docker.io
-                    pip install ortelius-cli
-                    git clone https://github.com/dstar55/docker-hello-world-spring-boot
-                    cd docker-hello-world-spring-boot
-                    dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
-                '''
+                    sh '''
+                        apt-get update && apt-get install -y docker.io
+                        pip install ortelius-cli
+                        git clone https://github.com/dstar55/docker-hello-world-spring-boot
+                        cd docker-hello-world-spring-boot
+                        dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
+                    '''
                 }
             }
         }
         stage('Docker Login') {
             steps {
                 container('python3') {
-                sh '''
-                    echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
-                '''
+                    sh '''
+                        echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
+                    '''
                 }
             }
-
         }
-        stage('Build and push image') {
+        stage('Build and Push Image') {
             steps {
                 container('python3') {
-                sh '''
-                    . ${WORKSPACE}/dhenv.sh
-                    docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
-                    docker push ${DOCKERREPO}:${IMAGE_TAG}
+                    sh '''
+                        . ${WORKSPACE}/dhenv.sh
+                        docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
+                        docker push ${DOCKERREPO}:${IMAGE_TAG}
 
-                    # This line determines the docker digest for the image
-                    echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
-                '''
+                        # This line determines the docker digest for the image
+                        echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
+                    '''
                 }
             }
         }
         stage('Capture SBOM') {
             steps {
                 container('python3') {
-                sh '''
-                    . ${WORKSPACE}/dhenv.sh
-                    # install Syft
-                    curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
+                    sh '''
+                        . ${WORKSPACE}/dhenv.sh
+                        # install Syft
+                        curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
 
-                    # create the SBOM
-                    ./syft packages ${DOCKERREPO}:${IMAGE_TAG} --scope all-layers -o cyclonedx-json > ${WORKSPACE}/cyclonedx.json
+                        # create the SBOM
+                        ./syft packages ${DOCKERREPO}:${IMAGE_TAG} --scope all-layers -o cyclonedx-json > ${WORKSPACE}/cyclonedx.json
 
-                    # display the SBOM
-                    cat ${WORKSPACE}/cyclonedx.json
-                '''
+                        # display the SBOM
+                        cat ${WORKSPACE}/cyclonedx.json
+                    '''
                 }
             }
         }
         stage('Create Component with Build Data and SBOM') {
             steps {
                 container('python3') {
-                sh '''
-                    . ${WORKSPACE}/dhenv.sh
-                    dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
-                '''
+                    sh '''
+                        . ${WORKSPACE}/dhenv.sh
+                        dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
+                    '''
                 }
             }
         }
+    }
+
     post {
         always {
             withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
                 discordSend description: """
-                                Result: ${currentBuild.currentResult}
-                                Service: ${JOB_NAME}
-                                Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
-                                Branch: ${env.GIT_BRANCH}
-                                Commit User: ${env.GIT_COMMITTER_NAME ?: 'N/A'} <${env.GIT_COMMITTER_EMAIL ?: 'N/A'}>
-                                Duration: ${currentBuild.durationString}
-                            """,
-                            footer: "I robot love you!",
-                            link: env.BUILD_URL,
-                            result: currentBuild.currentResult,
-                            title: env.JOB_NAME,
-                            webhookURL: "${DISCORD}"
+                                    Result: ${currentBuild.currentResult}
+                                    Service: ${env.JOB_NAME}
+                                    Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+                                    Branch: ${env.GIT_BRANCH}
+                                    Commit User: ${env.GIT_COMMITTER_NAME ?: 'N/A'} <${env.GIT_COMMITTER_EMAIL ?: 'N/A'}>
+                                    Duration: ${currentBuild.durationString}
+                                """,
+                                footer: "I robot love you!",
+                                link: env.BUILD_URL,
+                                result: currentBuild.currentResult,
+                                title: env.JOB_NAME,
+                                webhookURL: DISCORD
             }
         }
     }
