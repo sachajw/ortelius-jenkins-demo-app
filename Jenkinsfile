@@ -93,7 +93,7 @@ pipeline {
                                 Service: ${JOB_NAME}
                                 Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
                                 Branch: ${env.GIT_BRANCH}
-                                Commit User: ${sh(returnStdout: true, script: "git show -s --format='%an <%ae>' ${env.GIT_COMMIT}").trim()}                                qTriggered by: ${currentBuild.getBuildCauses()[0]?.userId ?: 'N/A'}
+                                Commit User: ${env.GIT_COMMITTER_NAME ?: 'N/A'} <${env.GIT_COMMITTER_EMAIL ?: 'N/A'}>
                                 Duration: ${currentBuild.durationString}
                             """,
                             footer: "I robot love you!",
