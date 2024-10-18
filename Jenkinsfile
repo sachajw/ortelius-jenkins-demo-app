@@ -21,6 +21,11 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']],
+                          userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]])
+            }
         stage('Setup') {
             steps {
                 sh '''
@@ -83,8 +88,9 @@ pipeline {
                             Result: ${currentBuild.currentResult}
                             Build Number: #${env.BUILD_NUMBER}
                             Branch: ${env.GIT_BRANCH}
-                            Commit: ${env.GIT_COMMIT}
-                            Triggered by: ${currentBuild.getBuildCauses().toString()}
+                            Commit User: ${env.GIT_AUTHOR_NAME} <${env.GIT_AUTHOR_EMAIL}>
+                            Commit SHA: ${env.GIT_COMMIT}
+                            Triggered by: ${currentBuild.getBuildCauses()[0]?.userId ?: 'N/A'}
                             Duration: ${currentBuild.durationString}
                             """,
                             footer: "Come to the Ortelius side of life!",
