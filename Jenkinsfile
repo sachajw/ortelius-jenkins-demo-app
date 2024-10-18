@@ -84,7 +84,6 @@ pipeline {
         always {
             withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
                 discordSend description: """
-                            Ortelius Demo App
                             Result: ${currentBuild.currentResult}
                             Build Number: #${env.BUILD_NUMBER}
                             Branch: ${env.GIT_BRANCH}
