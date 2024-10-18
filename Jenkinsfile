@@ -9,6 +9,7 @@ pipeline {
         DHPROJECT = "ortelius-jenkins-demo-app"
         DHURL = "https://ortelius.pangarabbit.com"
         DISCORD = credentials('pangarabbit-discord-jenkins')
+        GIT_COMMITTER_NAME = $(git show --name-only)
     }
 
     agent {
@@ -23,8 +24,12 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']],
-                          userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]])
+                checkout([$class: 'GitSCM',
+                branches: [[name: '*/main']],
+                doGenerateSubmoduleConfigurations: false,
+                extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'config']],
+                submoduleCfg: [],
+                userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]])
             }
         }
         stage('Setup') {
@@ -88,7 +93,7 @@ pipeline {
                                 Result: ${currentBuild.currentResult}
                                 Service: ${JOB_NAME} [#${env.BUILD_NUMBER}](${env.BUILD_URL})
                                 Branch: ${env.GIT_BRANCH}
-                                Commit User: ${env.GIT_COMMITTER_NAME ?: 'N/A'} <${env.GIT_COMMITTER_EMAIL ?: 'N/A'}>
+                                Commit User: ${GIT_COMMITTER_NAME}
                                 Triggered by: ${currentBuild.getBuildCauses()[0]?.userId ?: 'N/A'}
                                 Duration: ${currentBuild.durationString}
                             """,
