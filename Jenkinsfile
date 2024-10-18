@@ -88,8 +88,7 @@ pipeline {
                                 Result: ${currentBuild.currentResult}
                                 Build Number: #${env.BUILD_NUMBER}
                                 Branch: ${env.GIT_BRANCH}
-                                Commit User: ${env.GIT_AUTHOR_NAME} <${env.GIT_AUTHOR_EMAIL}>
-                                Commit SHA: ${env.GIT_COMMIT}
+                                Commit User: ${env.GIT_COMMITTER_NAME ?: 'N/A'} <${env.GIT_COMMITTER_EMAIL ?: 'N/A'}>
                                 Triggered by: ${currentBuild.getBuildCauses()[0]?.userId ?: 'N/A'}
                                 Duration: ${currentBuild.durationString}
                             """,
