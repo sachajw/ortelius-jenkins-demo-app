@@ -34,7 +34,6 @@ pipeline {
         stage('Docker Login') {
             steps {
                 sh '''
-                    #echo ${DHPASS} | docker login -u ${QUAYUSER} --password-stdin ${DHURL}
                     docker login -u ${QUAYUSER} --password-stdin ${DHURL}
 
                 '''
