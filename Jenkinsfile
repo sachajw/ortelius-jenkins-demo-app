@@ -23,12 +23,11 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM',
-                branches: [[name: '*/main']],
-                doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'config']],
-                submoduleCfg: [],
-                userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]])
+                container('python3') {
+                    checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]])
+                }
             }
         }
         stage('Setup') {
