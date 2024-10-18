@@ -80,13 +80,13 @@ pipeline {
     }
     post {
         always {
-            withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
-                discordSend description: "Jenkins Pipeline Build",
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'DISCORD')]) {
+                discordSend description: "Ortelius Demo App",
                             footer: "Footer Text",
                             link: env.BUILD_URL,
                             result: currentBuild.currentResult,
                             title: env.JOB_NAME,
-                            webhookURL: "${WEBHOOK_URL}"
+                            webhookURL: "${DISCORD}"
             }
         }
     }
