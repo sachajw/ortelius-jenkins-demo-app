@@ -36,7 +36,6 @@ pipeline {
             steps {
                 sh '''
                     docker login -u ${DHUSER} --password-stdin ${DHURL}
-
                 '''
             }
         }
@@ -78,14 +77,16 @@ pipeline {
                 '''
             }
         }
-        post {
-            always {
-                discordSend description: "Ortelius Demo App",
+    }
+    post {
+        always {
+            withCredentials([string(credentialsId: 'discord-webhook', variable: 'WEBHOOK_URL')]) {
+                discordSend description: "Jenkins Pipeline Build",
                             footer: "Footer Text",
                             link: env.BUILD_URL,
                             result: currentBuild.currentResult,
                             title: env.JOB_NAME,
-                            webhookURL: ${DISCORD}
+                            webhookURL: "${WEBHOOK_URL}"
             }
         }
     }
