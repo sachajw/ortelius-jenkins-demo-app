@@ -33,6 +33,7 @@ pipeline {
         }
         stage('Setup') {
             steps {
+                container('python3') {
                 sh '''
                     apt-get update && apt-get install -y docker.io
                     pip install ortelius-cli
@@ -40,6 +41,7 @@ pipeline {
                     cd docker-hello-world-spring-boot
                     dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
                 '''
+                }
             }
         }
         stage('Docker Login') {
