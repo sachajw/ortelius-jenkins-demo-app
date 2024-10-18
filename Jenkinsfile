@@ -23,6 +23,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Tells Jenkins that its a container running the job
                 container('python3') {
                     checkout([$class: 'GitSCM',
                     branches: [[name: '*/main']],
