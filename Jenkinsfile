@@ -1,13 +1,13 @@
 pipeline {
     environment {
-        DHUSER = credentials('dh-pangarabbit') "admin"
-        DHPASS = credentials('dh-pangarabbit') "admin"
         QUAYUSER = credentials('quay-pangarabbit')
         QUAYPASS = credentials('quay-pangarabbit')
         DOCKERREPO = "quay.io"
+        DHUSER = credentials('dh-pangarabbit')
+        DHPASS = credentials('dh-pangarabbit')
         DHORG = "pangarabbit"
         DHPROJECT = "ortelius-jenkins-demo-app"
-        DHURL = "https://ortelius.pangarabbit.com"
+        DHURL = "quay.io"
     }
 
     agent {
@@ -34,7 +34,9 @@ pipeline {
         stage('Docker Login') {
             steps {
                 sh '''
-                    echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
+                    #echo ${DHPASS} | docker login -u ${QUAYUSER} --password-stdin ${DHURL}
+                    docker login -u ${QUAYUSER} --password-stdin ${DHURL}
+
                 '''
             }
         }
