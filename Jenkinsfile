@@ -9,7 +9,7 @@ pipeline {
         DHPROJECT = "ortelius-jenkins-demo-app"
         DHURL = "https://ortelius.pangarabbit.com"
         DISCORD = credentials('pangarabbit-discord-jenkins')
-        GIT_COMMITTER_NAME = $(git show --name-only)
+        GIT_COMMITTER_NAME = "git show --name-only"
     }
 
     agent {
@@ -91,7 +91,8 @@ pipeline {
             withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
                 discordSend description: """
                                 Result: ${currentBuild.currentResult}
-                                Service: ${JOB_NAME} [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+                                Service: ${JOB_NAME}
+                                Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
                                 Branch: ${env.GIT_BRANCH}
                                 Commit User: ${GIT_COMMITTER_NAME}
                                 Triggered by: ${currentBuild.getBuildCauses()[0]?.userId ?: 'N/A'}
