@@ -35,12 +35,11 @@ pipeline {
              steps {
                  container('python3') {
                      script {
-                         // Extract committer email from the latest commit
-                         env.GIT_COMMITTER = sh(
-                             script: 'git --no-pager show -s --format=\'%ae\'',
-                             returnStdout: true
-                         ).trim()
-                     }
+                    env.GIT_COMMIT_USER = sh(
+                        script: "git log -1 --pretty=format:'%an'",
+                        returnStdout: true
+                    ).trim()
+                    }
                  }
              }
         }
@@ -117,7 +116,7 @@ pipeline {
                                     Service: ${env.JOB_NAME}
                                     Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
                                     Branch: ${env.GIT_BRANCH}
-                                    Commit User: ${env.GIT_COMMITTER}
+                                    Commit User: ${env.GIT_COMMIT_USER}
                                     Duration: ${currentBuild.durationString}
                                 """,
                                 footer: "I robot love you!",
