@@ -2,8 +2,8 @@ pipeline {
     environment {
         // DHUSER = "admin"
         // DHPASS = "admin"
-        DHUSER = credentials(quay-pangarabbit)
-        DHPASS = credentials(quay-pangarabbit)
+        DHUSER = credentials('quay-pangarabbit')
+        DHPASS = credentials('quay-pangarabbit')
         DHORG = "pangarabbit"
         DHPROJECT = "ortelius-jenkins-demo-app"
         DOCKERREPO = "thevestedleopard/hello-world"
