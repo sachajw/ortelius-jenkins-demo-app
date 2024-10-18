@@ -1,0 +1,16 @@
+# Application Name and Version - optional. If not used the Component will not be associated to an Application
+Application = “GLOBAL.your Application Name”
+Application_Version = “your Application Version”
+# Define Component Name, Variant and Version - required
+Name = “GLOBAL.your Component Name”
+Variant = “${GIT_BRANCH}”
+Version = “vyour Component Version.${BUILD_NUM}-g${SHORT_SHA}”
+# Key/Values to associate to the Component Version
+[Attributes]
+DockerBuildDate = “${BLDDATE}”
+DockerRepo = “${DOCKERREPO}”
+DockerSha = “${DIGEST}”
+DockerTag = “${IMAGE_TAG}”
+DiscordChannel = “Your Discord Channel” or SlackChannel=”Your Slack Channel”
+ServiceOwner= “${DHUSER}”
+ServiceOwnerEmail = “Your Component Owner Email”
