@@ -1,12 +1,12 @@
 pipeline {
     environment {
-        // DHUSER = "admin"
-        // DHPASS = "admin"
-        DHUSER = credentials('quay-pangarabbit')
-        DHPASS = credentials('quay-pangarabbit')
+        DHUSER = credentials('dh-pangarabbit') "admin"
+        DHPASS = credentials('dh-pangarabbit') "admin"
+        QUAYUSER = credentials('quay-pangarabbit')
+        QUAYPASS = credentials('quay-pangarabbit')
+        DOCKERREPO = "quay.io"
         DHORG = "pangarabbit"
         DHPROJECT = "ortelius-jenkins-demo-app"
-        DOCKERREPO = "quay.io"
         DHURL = "https://ortelius.pangarabbit.com"
     }
 
