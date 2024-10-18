@@ -1,16 +1,18 @@
 # Application Name and Version - optional. If not used the Component will not be associated to an Application
-Application = “GLOBAL.Jenkins Demo App”
-Application_Version = “1.0.0”
+Application = "GLOBAL.Jenkins Demo App"
+Application_Version = "1.0.0"
+
 # Define Component Name, Variant and Version - required
-Name = “GLOBAL.Jenkins Demo App
-Variant = “${GIT_BRANCH}”
-Version = “1.0.0.${BUILD_NUM}-g${SHORT_SHA}”
+Name = "GLOBAL.Jenkins Demo App"
+Variant = "${GIT_BRANCH}"
+Version = "1.0.0.${BUILD_NUM}-g${SHORT_SHA}"
+
 # Key/Values to associate to the Component Version
 [Attributes]
-DockerBuildDate = “${BLDDATE}”
-DockerRepo = “${DOCKERREPO}”
-DockerSha = “${DIGEST}”
-DockerTag = “${IMAGE_TAG}”
-DiscordChannel = “ortelius”
-ServiceOwner= “${DHUSER}”
-ServiceOwnerEmail = “sacha@pangarabbit.com”
+DockerBuildDate = "${BLDDATE}"
+DockerRepo = "${DOCKERREPO}"
+DockerSha = "${DIGEST}"
+DockerTag = "${IMAGE_TAG}"
+DiscordChannel = "ortelius"
+ServiceOwner= "${DHUSER}"
+ServiceOwnerEmail = "sacha@pangarabbit.com"
