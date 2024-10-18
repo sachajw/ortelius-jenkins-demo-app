@@ -43,9 +43,6 @@ pipeline {
             steps {
                 sh '''
                     . ${WORKSPACE}/dhenv.sh
-                    if [ -z "${IMAGE_TAG}" ]; then
-                        IMAGE_TAG="latest"
-                    fi
                     docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
                     docker push ${DOCKERREPO}:${IMAGE_TAG}
 
