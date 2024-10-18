@@ -21,6 +21,7 @@ pipeline {
         stage('Setup') {
             steps {
                 sh '''
+            apt-get update && apt-get install -y docker.io
             pip install ortelius-cli
             git clone https://github.com/dstar55/docker-hello-world-spring-boot
             cd docker-hello-world-spring-boot
