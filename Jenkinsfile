@@ -31,10 +31,14 @@ pipeline {
                 }
             }
         }
-        stage('Get Commit Info') {
+        stage('Git Committer') {
              steps {
                  container('python3') {
                      script {
+                   // Mark the directory as safe to prevent Git errors
+                    sh 'git config --global --add safe.directory ${WORKSPACE}'
+
+                   // Get the user who made the latest commit
                     env.GIT_COMMIT_USER = sh(
                         script: "git log -1 --pretty=format:'%an'",
                         returnStdout: true
