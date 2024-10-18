@@ -81,7 +81,7 @@ pipeline {
                 discordSend description: "Ortelius Demo App",
                             footer: "Come to the Ortelius side of life!",
                             link: env.BUILD_URL,
-                            result: currentBuild.currentResult,
+                            result: currentBuild.currentResult,currentBuild.result,currentBuild.durationString
                             title: env.JOB_NAME,
                             webhookURL: "${DISCORD}"
             }
