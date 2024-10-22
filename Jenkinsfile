@@ -30,16 +30,6 @@ pipeline {
                 }
             }
         }
-        // stage('Checkout') {
-        //     steps {
-        //         container('python3') {
-        //             checkout([$class: 'GitSCM',
-        //                 branches: [[name: '*/main']],
-        //                 userRemoteConfigs: [[url: 'https://github.com/dstar55/docker-hello-world-spring-boot']]
-        //             ])
-        //         }
-        //     }
-        // }
         stage('Git Committer') {
              steps {
                  container('python3') {
