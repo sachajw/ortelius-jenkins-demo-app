@@ -128,6 +128,15 @@ pipeline {
                                 title: env.JOB_NAME,
                                 webhookURL: DISCORD
             }
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'reports',
+                reportFiles: 'myreport.html',
+                reportName: 'My Reports',
+                reportTitles: 'The Report'
+            ])
         }
     }
 }
