@@ -133,7 +133,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: '/192.168.0.152/Volumes/pi8s/jenkins/jenkins/reports',
+                reportDir: '.',
                 reportFiles: 'myreport.html',
                 reportName: 'My Reports',
                 reportTitles: 'The Report'
