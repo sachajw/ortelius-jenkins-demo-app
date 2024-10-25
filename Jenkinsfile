@@ -134,7 +134,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: '../reports/',
+                reportDir: '/home/jenkins/reports/',
                 reportFiles: 'myreport.html',
                 reportName: 'My Reports',
                 reportTitles: 'The Report'
