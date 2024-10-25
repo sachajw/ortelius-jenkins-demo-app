@@ -138,8 +138,6 @@ pipeline {
                 reportName: 'My Reports',
                 reportTitles: 'The Report'
             ])
-
-             sh 'cp -r myreport.html /192.168.0.152/pi8s/jenkins/jenkins/reports'
         }
     }
 }
