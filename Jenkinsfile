@@ -53,7 +53,7 @@ pipeline {
                     sh '''
                         apt-get update && apt-get install -y docker.io
                         pip install ortelius-cli
-                        rm -rf ortelius-jenkins-demo-app
+                        rm -rf docker-hello-world-spring-boot
                         git clone https://github.com/dstar55/docker-hello-world-spring-boot
                         cd docker-hello-world-spring-boot
                         dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
