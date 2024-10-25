@@ -133,11 +133,13 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: '//192.168.0.152/Volumes/pi8s/jenkins/jenkins/reports',
+                reportDir: '/192.168.0.152/Volumes/pi8s/jenkins/jenkins/reports',
                 reportFiles: 'myreport.html',
                 reportName: 'My Reports',
                 reportTitles: 'The Report'
             ])
+
+             sh 'cp -r myreport.html /192.168.0.152/pi8s/jenkins/jenkins/reports'
         }
     }
 }
