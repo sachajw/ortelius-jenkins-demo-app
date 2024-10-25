@@ -9,6 +9,7 @@ pipeline {
         DHPROJECT = "ortelius-jenkins-demo-app"
         DHURL = "https://ortelius.pangarabbit.com"
         DISCORD = credentials('pangarabbit-discord-jenkins')
+        REPORT_DIR = "${env.JENKINS_HOME}/reports"
     }
 
     agent {
@@ -132,7 +133,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: '${env.JENKINS_HOME}/reports',
+                reportDir: '//192.168.0.152/Volumes/pi8s/jenkins/jenkins/reports',
                 reportFiles: 'myreport.html',
                 reportName: 'My Reports',
                 reportTitles: 'The Report'
