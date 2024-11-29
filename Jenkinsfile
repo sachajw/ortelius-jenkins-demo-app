@@ -129,7 +129,7 @@ pipeline {
     }
 
     post {
-        always {
+        success {
             echo 'Publishing HTML Report'
             publishHTML(target: [
                 allowMissing: false,
