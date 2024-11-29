@@ -24,34 +24,45 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'GitCheckout'
+                echo 'Git Checkout'
                 container('python3') {
                     withCredentials([string(credentialsId: 'gh-sachajw-walle-secret-text', variable: 'GITHUB_PAT')]) {
-                        sh 'git clone https://${GITHUB_PAT}@github.com/dstar55/docker-hello-world-spring-boot.git'
+                        sh 'git clone https://${GITHUB_PAT}@github.com/sachajw/ortelius-jenkins-demo-app.git'
                     }
                 }
             }
         }
+
         stage('Git Committer') {
             steps {
-                echo 'Git Committer'
+                echo 'Identifying Git Committer'
                 container('python3') {
                     script {
-                        // Mark the directory as safe to prevent Git errors
                         sh 'git config --global --add safe.directory ${WORKSPACE}'
-
-                        // Get the user who made the latest commit
                         env.GIT_COMMIT_USER = sh(
-                        script: "git log -1 --pretty=format:'%an'",
-                        returnStdout: true
-                    ).trim()
+                            script: "git log -1 --pretty=format:'%an'",
+                            returnStdout: true
+                        ).trim()
                     }
                 }
             }
         }
+
+        stage('Ortelius Report') {
+            steps {
+                echo 'Generating Ortelius Report'
+                container('python3') {
+                    sh '''
+                        ./mvnw clean install site surefire-report:report
+                        tree
+                    '''
+                }
+            }
+        }
+
         stage('Setup') {
             steps {
-                echo 'Setup Python Container'
+                echo 'Setting up Python Environment'
                 container('python3') {
                     sh '''
                         apt-get update && apt-get install -y docker.io
@@ -64,9 +75,10 @@ pipeline {
                 }
             }
         }
+
         stage('Docker Login') {
             steps {
-                echo 'Docker Login'
+                echo 'Logging into Docker'
                 container('python3') {
                     sh '''
                         echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
@@ -74,42 +86,38 @@ pipeline {
                 }
             }
         }
+
         stage('Build and Push Image') {
             steps {
-                echo 'Build and Push Image'
+                echo 'Building and Pushing Docker Image'
                 container('python3') {
                     sh '''
                         . ${WORKSPACE}/dhenv.sh
                         docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
                         docker push ${DOCKERREPO}:${IMAGE_TAG}
-
-                        # This line determines the docker digest for the image
                         echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
                     '''
                 }
             }
         }
+
         stage('Capture SBOM') {
             steps {
-                echo 'Capture SBOM'
+                echo 'Capturing SBOM'
                 container('python3') {
                     sh '''
                         . ${WORKSPACE}/dhenv.sh
-                        # install Syft
                         curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
-
-                        # create the SBOM
                         ./syft packages ${DOCKERREPO}:${IMAGE_TAG} --scope all-layers -o cyclonedx-json > ${WORKSPACE}/cyclonedx.json
-
-                        # display the SBOM
                         cat ${WORKSPACE}/cyclonedx.json
                     '''
                 }
             }
         }
+
         stage('Create Component with Build Data and SBOM') {
             steps {
-                echo 'Create Component with Build Data and SBOM'
+                echo 'Creating Component with Build Data and SBOM'
                 container('python3') {
                     sh '''
                         . ${WORKSPACE}/dhenv.sh
@@ -119,48 +127,37 @@ pipeline {
             }
         }
     }
-        stage('Ortelius Report') {
-            steps {
-                echo 'Ortelius Report'
-                    sh '''
-                        sh './mvnw clean install site surefire-report:report'
-                        sh 'tree'
-                    '''
-            }
-        }
-    }
-    post {
-        always {
-            echo 'Sending Discord Notification'
-            withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
-                discordSend description: """
-                                    Result: ${currentBuild.currentResult}
-                                    Service: ${env.JOB_NAME}
-                                    Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
-                                    Branch: ${env.GIT_BRANCH}
-                                    Commit User: ${env.GIT_COMMIT_USER}
-                                    Duration: ${currentBuild.durationString}
-                                """,
-                                footer: 'Wall-E love you!',
-                                link: env.BUILD_URL,
-                                result: currentBuild.currentResult,
-                                title: env.JOB_NAME,
-                                webhookURL: DISCORD
-            }
-        }
-    }
+
     post {
         always {
             echo 'Publishing HTML Report'
             publishHTML(target: [
                 allowMissing: false,
-                alwaysLinkToLastBuild: false,
-                keepAll: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
                 reportDir: 'target/site',
                 reportFiles: 'surefire-report.html',
-                reportName: 'SurefireReports',
-                reportTitles: ''.
-                useWrapperFileDirectly: true
+                reportName: 'Surefire Reports'
             ])
         }
+
+        always {
+            echo 'Sending Discord Notification'
+            withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
+                discordSend description: """
+                                Result: ${currentBuild.currentResult}
+                                Service: ${env.JOB_NAME}
+                                Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+                                Branch: ${env.GIT_BRANCH}
+                                Commit User: ${env.GIT_COMMIT_USER}
+                                Duration: ${currentBuild.durationString}
+                            """,
+                            footer: 'Wall-E loves you!',
+                            link: env.BUILD_URL,
+                            result: currentBuild.currentResult,
+                            title: env.JOB_NAME,
+                            webhookURL: DISCORD
+            }
+        }
     }
+}
