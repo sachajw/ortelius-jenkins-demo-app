@@ -25,7 +25,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 container('python3') {
-                    withCredentials([string(credentialsId: 'gh-sachajw-walle', variable: 'GITHUB_PAT')]) {
+                    withCredentials([usernamePassword(credentialsId: 'gh-sachajw-walle', variable: 'GITHUB_PAT')]) {
                         sh 'git clone https://${GITHUB_PAT}@github.com/dstar55/docker-hello-world-spring-boot.git'
                     }
                 }
