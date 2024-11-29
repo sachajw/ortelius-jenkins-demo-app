@@ -51,7 +51,7 @@ pipeline {
         stage('Ortelius Report') {
             steps {
                 echo 'Generating Ortelius Report'
-                container('mavenjk8') {
+                container('mavenjdk8') {
                     sh '''
                         ./mvnw clean install site surefire-report:report
                         tree
