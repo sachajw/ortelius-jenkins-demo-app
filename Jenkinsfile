@@ -2,12 +2,12 @@ pipeline {
     environment {
         QUAYUSER = credentials('quay-pangarabbit')
         QUAYPASS = credentials('quay-pangarabbit')
-        DOCKERREPO = "quay.io"
+        DOCKERREPO = 'quay.io'
         DHUSER = credentials('dh-pangarabbit')
         DHPASS = credentials('dh-pangarabbit')
-        DHORG = "pangarabbit"
-        DHPROJECT = "ortelius-jenkins-demo-app"
-        DHURL = "https://ortelius.pangarabbit.com"
+        DHORG = 'pangarabbit'
+        DHPROJECT = 'ortelius-jenkins-demo-app'
+        DHURL = 'https://ortelius.pangarabbit.com'
         DISCORD = credentials('pangarabbit-discord-jenkins')
         REPORT_DIR = "${env.JENKINS_HOME}/reports"
     }
@@ -24,6 +24,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                echo 'GitCheckout'
                 container('python3') {
                     withCredentials([string(credentialsId: 'gh-sachajw-walle-secret-text', variable: 'GITHUB_PAT')]) {
                         sh 'git clone https://${GITHUB_PAT}@github.com/dstar55/docker-hello-world-spring-boot.git'
@@ -32,23 +33,25 @@ pipeline {
             }
         }
         stage('Git Committer') {
-             steps {
-                 container('python3') {
-                     script {
-                   // Mark the directory as safe to prevent Git errors
-                    sh 'git config --global --add safe.directory ${WORKSPACE}'
+            steps {
+                echo 'Git Committer'
+                container('python3') {
+                    script {
+                        // Mark the directory as safe to prevent Git errors
+                        sh 'git config --global --add safe.directory ${WORKSPACE}'
 
-                   // Get the user who made the latest commit
-                    env.GIT_COMMIT_USER = sh(
+                        // Get the user who made the latest commit
+                        env.GIT_COMMIT_USER = sh(
                         script: "git log -1 --pretty=format:'%an'",
                         returnStdout: true
                     ).trim()
                     }
-                 }
-             }
+                }
+            }
         }
         stage('Setup') {
             steps {
+                echo 'Setup Python Container'
                 container('python3') {
                     sh '''
                         apt-get update && apt-get install -y docker.io
@@ -63,6 +66,7 @@ pipeline {
         }
         stage('Docker Login') {
             steps {
+                echo 'Docker Login'
                 container('python3') {
                     sh '''
                         echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
@@ -72,6 +76,7 @@ pipeline {
         }
         stage('Build and Push Image') {
             steps {
+                echo 'Build and Push Image'
                 container('python3') {
                     sh '''
                         . ${WORKSPACE}/dhenv.sh
@@ -86,6 +91,7 @@ pipeline {
         }
         stage('Capture SBOM') {
             steps {
+                echo 'Capture SBOM'
                 container('python3') {
                     sh '''
                         . ${WORKSPACE}/dhenv.sh
@@ -103,6 +109,7 @@ pipeline {
         }
         stage('Create Component with Build Data and SBOM') {
             steps {
+                echo 'Create Component with Build Data and SBOM'
                 container('python3') {
                     sh '''
                         . ${WORKSPACE}/dhenv.sh
@@ -112,9 +119,19 @@ pipeline {
             }
         }
     }
-
+        stage('Ortelius Report') {
+            steps {
+                echo 'Ortelius Report'
+                    sh '''
+                        sh './mvnw clean install site surefire-report:report'
+                        sh 'tree'
+                    '''
+            }
+        }
+    }
     post {
         always {
+            echo 'Sending Discord Notification'
             withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
                 discordSend description: """
                                     Result: ${currentBuild.currentResult}
@@ -124,12 +141,17 @@ pipeline {
                                     Commit User: ${env.GIT_COMMIT_USER}
                                     Duration: ${currentBuild.durationString}
                                 """,
-                                footer: "Wall E love you!",
+                                footer: 'Wall-E love you!',
                                 link: env.BUILD_URL,
                                 result: currentBuild.currentResult,
                                 title: env.JOB_NAME,
                                 webhookURL: DISCORD
             }
+        }
+    }
+    post {
+        always {
+            echo 'Publishing HTML Report'
             publishHTML(target: [
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
@@ -137,8 +159,7 @@ pipeline {
                 reportDir: '.',
                 reportFiles: 'ortelius.html',
                 reportName: 'Ortelius Reports',
-                reportTitles: 'Aliens Are Coming'
+                reportTitles: ''
             ])
         }
     }
-}
