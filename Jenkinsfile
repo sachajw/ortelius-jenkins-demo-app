@@ -14,7 +14,7 @@ pipeline {
 
     agent {
         kubernetes {
-            cloud 'PangaRabbit K8s'
+            cloud 'PangaRabbit K3s'
             defaultContainer 'python3'
             inheritFrom 'python3'
             namespace 'app'
@@ -25,7 +25,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 container('python3') {
-                    withCredentials([string(credentialsId: 'gh-walle', variable: 'GITHUB_PAT')]) {
+                    withCredentials([string(credentialsId: 'gh-sachajw-walle', variable: 'GITHUB_PAT')]) {
                         sh 'git clone https://${GITHUB_PAT}@github.com/dstar55/docker-hello-world-spring-boot.git'
                     }
                 }
@@ -134,10 +134,10 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: '/home/jenkins/reports/',
-                reportFiles: 'myreport.html',
-                reportName: 'My Reports',
-                reportTitles: 'The Report'
+                reportDir: '/var/jenkins_home/reports/',
+                reportFiles: 'ortelius.html',
+                reportName: 'Ortelius Reports',
+                reportTitles: 'Aliens Are Coming'
             ])
         }
     }
