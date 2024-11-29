@@ -154,12 +154,13 @@ pipeline {
             echo 'Publishing HTML Report'
             publishHTML(target: [
                 allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: '.',
-                reportFiles: 'ortelius.html',
-                reportName: 'Ortelius Reports',
-                reportTitles: ''
+                alwaysLinkToLastBuild: false,
+                keepAll: false,
+                reportDir: 'target/site',
+                reportFiles: 'surefire-report.html',
+                reportName: 'SurefireReports',
+                reportTitles: ''.
+                useWrapperFileDirectly: true
             ])
         }
     }
