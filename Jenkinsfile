@@ -134,7 +134,7 @@ pipeline {
                 allowMissing: false,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
-                reportDir: '/var/jenkins_home/reports/',
+                reportDir: '.',
                 reportFiles: 'ortelius.html',
                 reportName: 'Ortelius Reports',
                 reportTitles: 'Aliens Are Coming'
