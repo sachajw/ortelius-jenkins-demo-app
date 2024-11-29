@@ -15,8 +15,7 @@ pipeline {
     agent {
         kubernetes {
             cloud 'PangaRabbit K3s'
-            defaultContainer 'python3'
-            inheritFrom 'python3'
+            defaultContainer 'default'
             namespace 'app'
         }
     }
