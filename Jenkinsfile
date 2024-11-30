@@ -46,7 +46,7 @@ pipeline {
             }
         }
 
-        stage('Surfire Report') {
+        stage('Surefire Report') {
             steps {
                 echo 'Generating Ortelius Report'
                 container('maven39') {
@@ -91,6 +91,7 @@ pipeline {
                 }
             }
         }
+    }
 
     post {
         success {
@@ -121,7 +122,6 @@ pipeline {
                             result: currentBuild.currentResult,
                             title: env.JOB_NAME,
                             webhookURL: DISCORD
-               }
             }
         }
     }
