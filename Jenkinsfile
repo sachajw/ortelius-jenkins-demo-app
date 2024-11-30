@@ -121,6 +121,7 @@ pipeline {
                             result: currentBuild.currentResult,
                             title: env.JOB_NAME,
                             webhookURL: DISCORD
+               }
             }
         }
     }
