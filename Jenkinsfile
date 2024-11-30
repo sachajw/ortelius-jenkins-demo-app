@@ -14,9 +14,8 @@ pipeline {
 
     agent {
         kubernetes {
-            cloud 'PangaRabbit K3s'
-            defaultContainer 'default'
-            namespace 'app'
+            label 'default'
+            defaultContainer 'python39'
         }
     }
 
@@ -24,7 +23,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Git Checkout'
-                container('python3') {
+                container('python39') {
                     withCredentials([string(credentialsId: 'gh-sachajw-walle-secret-text', variable: 'GITHUB_PAT')]) {
                         sh 'git clone https://${GITHUB_PAT}@github.com/sachajw/ortelius-jenkins-demo-app.git'
                     }
@@ -35,7 +34,7 @@ pipeline {
         stage('Git Committer') {
             steps {
                 echo 'Identifying Git Committer'
-                container('python3') {
+                container('python39') {
                     script {
                         sh 'git config --global --add safe.directory ${WORKSPACE}'
                         env.GIT_COMMIT_USER = sh(
@@ -47,10 +46,10 @@ pipeline {
             }
         }
 
-        stage('Ortelius Report') {
+        stage('Surfire Report') {
             steps {
                 echo 'Generating Ortelius Report'
-                container('mavenjdk8') {
+                container('maven39') {
                     sh '''
                         ./mvnw clean install site surefire-report:report
                         tree
@@ -61,71 +60,37 @@ pipeline {
 
         stage('Setup') {
             steps {
-                echo 'Setting up Python Environment'
-                container('python3') {
+                echo 'Ortelius Setup'
+                container('python39') {
                     sh '''
-                        apt-get update && apt-get install -y docker.io
                         pip install ortelius-cli
                         rm -rf docker-hello-world-spring-boot
                         git clone https://github.com/dstar55/docker-hello-world-spring-boot
                         cd docker-hello-world-spring-boot
                         dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
-                    '''
-                }
-            }
-        }
 
-        stage('Docker Login') {
-            steps {
-                echo 'Logging into Docker'
-                container('python3') {
-                    sh '''
+                        echo Logging into Docker
                         echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
-                    '''
-                }
-            }
-        }
 
-        stage('Build and Push Image') {
-            steps {
-                echo 'Building and Pushing Docker Image'
-                container('python3') {
-                    sh '''
+                        echo Building and Pushing Docker Image
                         . ${WORKSPACE}/dhenv.sh
                         docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
                         docker push ${DOCKERREPO}:${IMAGE_TAG}
                         echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
-                    '''
-                }
-            }
-        }
 
-        stage('Capture SBOM') {
-            steps {
-                echo 'Capturing SBOM'
-                container('python3') {
-                    sh '''
+                        echo Capturing SBOM
                         . ${WORKSPACE}/dhenv.sh
                         curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
                         ./syft packages ${DOCKERREPO}:${IMAGE_TAG} --scope all-layers -o cyclonedx-json > ${WORKSPACE}/cyclonedx.json
                         cat ${WORKSPACE}/cyclonedx.json
-                    '''
-                }
-            }
-        }
 
-        stage('Create Component with Build Data and SBOM') {
-            steps {
-                echo 'Creating Component with Build Data and SBOM'
-                container('python3') {
-                    sh '''
+                        echo Creating Component with Build Data and SBOM
                         . ${WORKSPACE}/dhenv.sh
                         dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
                     '''
                 }
             }
         }
-    }
 
     post {
         success {
