@@ -55,7 +55,8 @@ pipeline {
                     securityContext:
                       privileged: true
                 restartPolicy: Always
-            '''
+              '''
+            retries: 3
         }
     }
 
