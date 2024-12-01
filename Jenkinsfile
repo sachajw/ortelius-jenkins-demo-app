@@ -26,20 +26,14 @@ pipeline {
                 containers:
                   - name: maven39
                     image: maven:3.9.9-amazoncorretto-8
-                    command: ["cat"]
                     args: []
                     securityContext:
                       privileged: true
-                  - name: kaniko
-                    image: gcr.io/kaniko-project/executor:latest
-                    command: ["/busybox/sh"]
-                    args: []
                     securityContext:
                       privileged: true
                   - name: python39
                     image: python:3.9-slim
-                    command: ["/bin/sh", "-c"]
-                    args: ["cat"]
+                    args: []
                     securityContext:
                       privileged: true
                 restartPolicy: Always
