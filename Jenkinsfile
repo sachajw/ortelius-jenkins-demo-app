@@ -14,8 +14,48 @@ pipeline {
 
     agent {
         kubernetes {
-            label 'default'
-            defaultContainer 'python39'
+            yaml '''
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                name: build-pod
+                namespace: app
+                labels:
+                  app: build-pod
+              spec:
+                containers:
+                  - name: maven39
+                    image: maven:3.9.9-amazoncorretto-8
+                    command: ["cat"]
+                    args: []
+                    securityContext:
+                      privileged: true
+                  - name: kaniko
+                    image: gcr.io/kaniko-project/executor:debug
+                    command: ["/busybox/sh"]
+                    args: []
+                    securityContext:
+                      privileged: true
+                  - name: hadolint
+                    image: hadolint/hadolint:latest-debian
+                    command: ["sleep"]
+                    args: ["3600"]
+                    securityContext:
+                      privileged: true
+                  - name: trivy
+                    image: aquasec/trivy
+                    command: ["sleep"]
+                    args: ["3600"]
+                    securityContext:
+                      privileged: true
+                  - name: python39
+                    image: python:3.9-slim
+                    command: ["/bin/sh", "-c"]
+                    args: ["cat"]
+                    securityContext:
+                      privileged: true
+                restartPolicy: Always
+            '''
         }
     }
 
