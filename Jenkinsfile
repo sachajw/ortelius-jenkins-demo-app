@@ -36,18 +36,6 @@ pipeline {
                     args: []
                     securityContext:
                       privileged: true
-                  - name: hadolint
-                    image: hadolint/hadolint:latest-debian
-                    command: ["sleep"]
-                    args: ["3600"]
-                    securityContext:
-                      privileged: true
-                  - name: trivy
-                    image: aquasec/trivy
-                    command: ["sleep"]
-                    args: ["3600"]
-                    securityContext:
-                      privileged: true
                   - name: python39
                     image: python:3.9-slim
                     command: ["/bin/sh", "-c"]
