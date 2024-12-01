@@ -14,7 +14,7 @@ pipeline {
 
     agent {
         kubernetes {
-            label 'build-tools-template'
+            label 'default'
             defaultContainer 'python39'
         }
     }
