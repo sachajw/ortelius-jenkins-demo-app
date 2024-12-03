@@ -33,6 +33,41 @@ pipeline {
         }
     }
 
+        stage('Setup') {
+            steps {
+                echo 'Ortelius Setup'
+                container('python39') {
+                    sh '''
+                        pip install ortelius-cli
+                        #rm -rf docker-hello-world-spring-boot
+                        #git clone https://github.com/sachajw/ortelius-jenkins-demo-app.git
+                        #cd ortelius-jenkins-demo-app
+                        dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
+
+                        echo Logging into Docker
+                        echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
+
+                        echo Building and Pushing Docker Image
+                        . ${WORKSPACE}/dhenv.sh
+                        docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
+                        docker push ${DOCKERREPO}:${IMAGE_TAG}
+                        echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
+
+                        echo Capturing SBOM
+                        . ${WORKSPACE}/dhenv.sh
+                        curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
+                        ./syft packages ${DOCKERREPO}:${IMAGE_TAG} --scope all-layers -o cyclonedx-json > ${WORKSPACE}/cyclonedx.json
+                        cat ${WORKSPACE}/cyclonedx.json
+
+                        echo Creating Component with Build Data and SBOM
+                        . ${WORKSPACE}/dhenv.sh
+                        dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
+                    '''
+                }
+            }
+        }
+    }
+
     post {
         success {
             echo 'Publishing HTML Report'
