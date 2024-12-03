@@ -4,7 +4,7 @@ pipeline {
     }
     environment {
         DOCKERREPO = 'quay.io/pangarabbit/ortelius-jenkins-demo-app'
-        IMAGE_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.substring(0, 7)}"
+        IMAGE_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.take(7)}"
         DISCORD = credentials('pangarabbit-discord-jenkins')
         DEFAULT_CONTAINER = 'agent-jdk17'
         KANIKO_CONTAINER = 'kaniko'
@@ -15,8 +15,10 @@ pipeline {
             steps {
                 container("${DEFAULT_CONTAINER}") {
                     withCredentials([string(credentialsId: 'gh-sachajw-walle-secret-text', variable: 'GITHUB_PAT')]) {
-                        sh "git config --global --add safe.directory ${env.WORKSPACE} && \
-                        git clone https://'${GITHUB_PAT}'@github.com/sachajw/ortelius-jenkins-demo-app.git"
+                        sh """
+                            git config --global --add safe.directory ${env.WORKSPACE} && \\
+                            git clone https://${GITHUB_PAT}@github.com/sachajw/ortelius-jenkins-demo-app.git
+                        """
                     }
                 }
             }
@@ -31,17 +33,12 @@ pipeline {
                 }
             }
         }
-    }
 
-        stage('Setup') {
+        stage('Ortelius') {
             steps {
-                echo 'Ortelius Setup'
-                container('python39') {
+                container("${DEFAULT_CONTAINER}") {
                     sh '''
                         pip install ortelius-cli
-                        #rm -rf docker-hello-world-spring-boot
-                        #git clone https://github.com/sachajw/ortelius-jenkins-demo-app.git
-                        #cd ortelius-jenkins-demo-app
                         dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
 
                         echo Logging into Docker
@@ -72,32 +69,34 @@ pipeline {
         success {
             echo 'Publishing HTML Report'
             publishHTML(target: [
-            allowMissing: false,
-            alwaysLinkToLastBuild: true,
-            keepAll: true,
-            reportDir: 'target/site',
-            reportFiles: 'surefire-report.html',
-            reportName: 'Surefire Reports'
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/site',
+                reportFiles: 'surefire-report.html',
+                reportName: 'Surefire Reports'
             ])
         }
 
         always {
             echo 'Sending Discord Notification'
             withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
-                discordSend description: """
-                            Result: ${currentBuild.currentResult}
-                            Service: ${env.JOB_NAME}
-                            Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
-                            Branch: ${env.GIT_BRANCH}
-                            Commit User: ${env.GIT_COMMIT_USER}
-                            Duration: ${currentBuild.durationString}
-                        """,
-                        footer: 'Wall-E loves you!',
-                        link: env.BUILD_URL,
-                        result: currentBuild.currentResult,
-                        title: env.JOB_NAME,
-                        webhookURL: DISCORD
-                }
+                discordSend(
+                    description: """
+                        Result: ${currentBuild.currentResult}
+                        Service: ${env.JOB_NAME}
+                        Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+                        Branch: ${env.GIT_BRANCH}
+                        Commit User: ${env.GIT_COMMIT_USER}
+                        Duration: ${currentBuild.durationString}
+                    """,
+                    footer: 'Wall-E loves you!',
+                    link: env.BUILD_URL,
+                    result: currentBuild.currentResult,
+                    title: env.JOB_NAME,
+                    webhookURL: DISCORD
+                )
             }
         }
     }
+}
