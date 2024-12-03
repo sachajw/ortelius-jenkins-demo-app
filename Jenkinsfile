@@ -35,7 +35,6 @@ pipeline {
     }
 }
 
-
     post {
         success {
             echo 'Publishing HTML Report'
