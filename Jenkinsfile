@@ -6,7 +6,7 @@ pipeline {
         DOCKERREPO = 'quay.io/pangarabbit/ortelius-jenkins-demo-app'
         IMAGE_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.substring(0, 7)}"
         DISCORD = credentials('pangarabbit-discord-jenkins')
-        DEFAULT_CONTAINER = 'bb-default4'
+        DEFAULT_CONTAINER = 'agent-jdk17'
         KANIKO_CONTAINER = 'kaniko'
     }
 
