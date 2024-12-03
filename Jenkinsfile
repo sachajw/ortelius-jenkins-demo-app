@@ -3,10 +3,9 @@ pipeline {
         label 'jenkins-jenkins-agent'
     }
     environment {
-        GITHUB_PAT = credentials('gh-sachajw-walle-secret-text')
         DOCKERREPO = 'quay.io/pangarabbit/ortelius-jenkins-demo-app'
         IMAGE_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.substring(0, 7)}"
-        DISCORD_WEBHOOK = credentials('pangarabbit-discord-jenkins')
+        DISCORD = credentials('pangarabbit-discord-jenkins')
         DEFAULT_CONTAINER = 'agent-jdk17'
         KANIKO_CONTAINER = 'kaniko'
     }
@@ -15,7 +14,7 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 container("${DEFAULT_CONTAINER}") {
-                    withCredentials([string(credentialsId: "${GITHUB_PAT}", variable: 'GITHUB_PAT')]) {
+                    withCredentials([string(credentialsId: 'gh-sachajw-walle-secret-text', variable: 'GITHUB_PAT')]) {
                         sh "git config --global --add safe.directory ${env.WORKSPACE} && \
                         git clone https://'${GITHUB_PAT}'@github.com/sachajw/ortelius-jenkins-demo-app.git"
                     }
@@ -49,7 +48,7 @@ pipeline {
 
         always {
             echo 'Sending Discord Notification'
-            withCredentials([string(credentialsId: "${DISCORD_WEBHOOK}", variable: 'DISCORD_WEBHOOK')]) {
+            withCredentials([string(credentialsId: 'pangarabbit-discord-jenkins', variable: 'DISCORD')]) {
                 discordSend description: """
                             Result: ${currentBuild.currentResult}
                             Service: ${env.JOB_NAME}
