@@ -26,7 +26,7 @@ pipeline {
             steps {
                 container("${DEFAULT_CONTAINER}") {
                     sh '''
-                        ./mvnw clean install site surefire-report:report -Dcheckstyle.skip=true
+                        ./mvn clean install site surefire-report:report -Dcheckstyle.skip=true
                     '''
                 }
             }
