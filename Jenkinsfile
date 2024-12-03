@@ -6,7 +6,7 @@ pipeline {
         DOCKERREPO = 'quay.io/pangarabbit/ortelius-jenkins-demo-app'
         IMAGE_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT.substring(0, 7)}"
         DISCORD = credentials('pangarabbit-discord-jenkins')
-        DEFAULT_CONTAINER = 'agent-jdk17'
+        DEFAULT_CONTAINER = 'bb-default4'
         KANIKO_CONTAINER = 'kaniko'
     }
 
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 container("${DEFAULT_CONTAINER}") {
                     sh '''
-                        ./mvn clean install site surefire-report:report -Dcheckstyle.skip=true
+                        ./mvnw clean install site surefire-report:report -Dcheckstyle.skip=true
                     '''
                 }
             }
