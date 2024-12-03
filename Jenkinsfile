@@ -32,38 +32,38 @@ pipeline {
                 }
             }
         }
+    }
 
-        post {
-            success {
-                echo 'Publishing HTML Report'
-                publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'target/site',
-                reportFiles: 'surefire-report.html',
-                reportName: 'Surefire Reports'
-                ])
-            }
+    post {
+        success {
+            echo 'Publishing HTML Report'
+            publishHTML(target: [
+            allowMissing: false,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: 'target/site',
+            reportFiles: 'surefire-report.html',
+            reportName: 'Surefire Reports'
+            ])
+        }
 
-            always {
-                echo 'Sending Discord Notification'
-                withCredentials([string(credentialsId: "${DISCORD_WEBHOOK}", variable: 'DISCORD_WEBHOOK')]) {
-                    discordSend description: """
-                                Result: ${currentBuild.currentResult}
-                                Service: ${env.JOB_NAME}
-                                Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
-                                Branch: ${env.GIT_BRANCH}
-                                Commit User: ${env.GIT_COMMIT_USER}
-                                Duration: ${currentBuild.durationString}
-                            """,
-                            footer: 'Wall-E loves you!',
-                            link: env.BUILD_URL,
-                            result: currentBuild.currentResult,
-                            title: env.JOB_NAME,
-                            webhookURL: DISCORD
+        always {
+            echo 'Sending Discord Notification'
+            withCredentials([string(credentialsId: "${DISCORD_WEBHOOK}", variable: 'DISCORD_WEBHOOK')]) {
+                discordSend description: """
+                            Result: ${currentBuild.currentResult}
+                            Service: ${env.JOB_NAME}
+                            Build Number: [#${env.BUILD_NUMBER}](${env.BUILD_URL})
+                            Branch: ${env.GIT_BRANCH}
+                            Commit User: ${env.GIT_COMMIT_USER}
+                            Duration: ${currentBuild.durationString}
+                        """,
+                        footer: 'Wall-E loves you!',
+                        link: env.BUILD_URL,
+                        result: currentBuild.currentResult,
+                        title: env.JOB_NAME,
+                        webhookURL: DISCORD
                 }
             }
         }
     }
-}
