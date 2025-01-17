@@ -25,15 +25,15 @@ pipeline {
             }
         }
 
-        stage('Surefire Report') {
-            steps {
-                container("${JDK17_CONTAINER}") {
-                    sh '''
-                        ./mvnw clean install site surefire-report:report -Dcheckstyle.skip=true
-                    '''
-                }
-            }
-        }
+        // stage('Surefire Report') {
+        //     steps {
+        //         container("${JDK17_CONTAINER}") {
+        //             sh '''
+        //                 ./mvnw clean install site surefire-report:report -Dcheckstyle.skip=true
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Ortelius') {
             steps {
@@ -41,17 +41,7 @@ pipeline {
                     sh '''
                         pip install ortelius-cli
                         dh envscript --envvars component.toml --envvars_sh ${WORKSPACE}/dhenv.sh
-
-                        echo Logging into Docker
-                        echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
-
-                        echo Building and Pushing Docker Image
-                        . ${WORKSPACE}/dhenv.sh
-                        docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
-                        docker push ${DOCKERREPO}:${IMAGE_TAG}
-                        echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
-
-                        echo Capturing SBOM
+                                                echo Capturing SBOM
                         . ${WORKSPACE}/dhenv.sh
                         curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
                         ./syft packages ${DOCKERREPO}:${IMAGE_TAG} --scope all-layers -o cyclonedx-json > ${WORKSPACE}/cyclonedx.json
@@ -60,7 +50,23 @@ pipeline {
                         echo Creating Component with Build Data and SBOM
                         . ${WORKSPACE}/dhenv.sh
                         dh updatecomp --rsp component.toml --deppkg "cyclonedx@${WORKSPACE}/cyclonedx.json"
-                    '''
+                       '''
+                }
+            }
+        }
+
+        stage('Docker') {
+            steps {
+                container("${KANIKO_CONTAINER}") {
+                    sh '''
+                        echo Logging into Docker
+                        echo ${DHPASS} | docker login -u ${DHUSER} --password-stdin ${DHURL}
+                        echo Building and Pushing Docker Image
+                        . ${WORKSPACE}/dhenv.sh
+                        docker build --tag ${DOCKERREPO}:${IMAGE_TAG} .
+                        docker push ${DOCKERREPO}:${IMAGE_TAG}
+                        echo export DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKERREPO}:${IMAGE_TAG} | cut -d: -f2 | cut -c-12) >> ${WORKSPACE}/dhenv.sh
+                        '''
                 }
             }
         }
