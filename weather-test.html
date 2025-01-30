@@ -5,30 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>South Africa Weather</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-
-        #weather-result {
-            margin-top: 20px;
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .loading {
-            font-style: italic;
-            color: gray;
-        }
-
-        .error {
-            color: red;
-        }
-    </style>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="styles.css">
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const weatherResult = document.getElementById('weather-result');
@@ -36,8 +14,9 @@
             function getWeather() {
                 const url = 'https://wttr.in/South+Africa?format=%C+%t+%w';
 
-                // Show loading message
-                weatherResult.innerHTML = '<p class="loading">Loading weather data...</p>';
+                // Show loading message with a class
+                weatherResult.textContent = "Loading weather data...";
+                weatherResult.className = "loading";
 
                 // Perform AJAX call
                 fetch(url)
@@ -52,9 +31,11 @@
                             <h2>Weather in South Africa</h2>
                             <p>${data}</p>
                         `;
+                        weatherResult.className = ""; // Clear loading or error class
                     })
                     .catch(error => {
-                        weatherResult.innerHTML = `<p class="error">Error fetching data: ${error.message}</p>`;
+                        weatherResult.textContent = `Error fetching data: ${error.message}`;
+                        weatherResult.className = "error";
                     });
             }
 
